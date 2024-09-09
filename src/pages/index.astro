@@ -1,5 +1,5 @@
 ---
-
+import SearchIcon from '~icons/mingcute/search2-fill';
 ---
 
 <html lang="en">
@@ -11,6 +11,90 @@
 		<title>Astro</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<h1 id="title" contenteditable="plaintext-only" class="outline-none"></h1>
+		<article id="text" contenteditable="plaintext-only" class="outline-none"></article>
+
+		<button id="search-trigger">
+    		<span class="sr-only">Search</span>
+    		<SearchIcon />
+		</button>
+
+		<dialog id="search-dialog" class="max-w-prose w-full h-[70dvh] rounded shadow-2xl px-8 py-4">
+			<h1>Search</h1>
+			<form class="flex gap-2 px-4 py-2 relative rounded border border-slate-300 w-full justify-end">
+				<label class="sr-only" for="search">Search</label>
+				<input
+					type="text"
+					placeholder="Search"
+					id="search"
+					class="absolute inset-0 w-full h-full px-4 py-2 pr-12"
+				/>
+				<SearchIcon class="z-10" />
+			</form>
+			<form method="dialog"><button>Close</button></form>
+			<ul id="search-results" class="flex flex-col gap-2">
+			</ul>
+		</dialog>
 	</body>
 </html>
+
+<script>
+  import { eq, like } from "drizzle-orm";
+  import { db, Docs, initTables } from "../lib/db";
+  import { getElement } from '../utils'
+
+  const title = getElement('title');
+  const text = getElement('text');
+  const search = getElement('search') as HTMLInputElement;
+  const searchDialog = getElement('search-dialog') as HTMLDialogElement;
+  const searchTrigger = getElement('search-trigger');
+  const searchResults = getElement('search-results');
+
+  window.addEventListener('hashchange', () => {
+    searchDialog.close();
+    init();
+  });
+
+  async function init() {
+    let docId = window.location.hash.slice(1);
+    let doc = await db.select().from(Docs).where(eq(Docs.id, Number(docId))).get();
+    if (!doc) {
+      doc = await db.insert(Docs).values({ title: 'Untitled', text: '' }).returning().get();
+      window.location.hash = `${doc.id}`;
+    }
+
+    title.innerText = doc.title;
+    text.innerText = doc.text;
+  }
+
+  await init();
+
+  title.addEventListener('input', async () => {
+    await db.update(Docs).set({ title: title.innerText }).where(eq(Docs.id, 1));
+  });
+
+  text.addEventListener('input', async () => {
+    await db.update(Docs).set({ text: text.innerText }).where(eq(Docs.id, 1));
+  });
+
+  searchTrigger.addEventListener('click', () => {
+    searchDialog.showModal();
+  });
+
+  search.addEventListener('input', async (e) => {
+    const query = search.value;
+    let results: typeof Docs.$inferSelect[] = [];
+    if  (query.length) {
+      results = await db
+		.select()
+		.from(Docs)
+		.where(like(Docs.title, `${query}%`))
+		.orderBy(Docs.title);
+    }
+    searchResults.innerHTML = '';
+    for (const result of results) {
+      searchResults.innerHTML += `<li><a href="/#${result.id}">${result.title}</a></li>`;
+    }
+  })
+
+</script>

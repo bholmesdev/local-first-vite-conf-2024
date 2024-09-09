@@ -1,15 +1,32 @@
 import { SQLocalDrizzle } from "sqlocal/drizzle";
 import { drizzle } from "drizzle-orm/sqlite-proxy";
-import { blob, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  customType,
+  integer,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 export const db = drizzle(new SQLocalDrizzle("database.sqlite3").driver);
+
+const vectorType = customType<{ data: number[]; driverData: ArrayBufferLike }>({
+  dataType() {
+    return "blob";
+  },
+  toDriver(value) {
+    return new Float32Array(value).buffer;
+  },
+  fromDriver(value) {
+    return Array.from(new Float32Array(new Uint8Array(value).buffer));
+  },
+});
 
 export const Docs = sqliteTable("Docs", {
   id: integer("id").primaryKey(),
   title: text("title").notNull(),
   text: text("text").notNull(),
-  vector: blob("vector"),
+  vector: vectorType("vector"),
   createdAt: text("created_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),

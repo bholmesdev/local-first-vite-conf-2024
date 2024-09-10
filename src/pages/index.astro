@@ -70,9 +70,8 @@ import CloseIcon from '~icons/mingcute/close-fill';
 	const text = getElement('text');
 	const search = getElement('search') as HTMLInputElement;
 	const searchDialog = getElement('search-dialog') as HTMLDialogElement;
-	const searchTrigger = getElement('search-trigger');
-	const migrationTrigger = getElement('migration-trigger') as HTMLInputElement;
 	const searchResults = getElement('search-results');
+	const searchTrigger = getElement('search-trigger');
 
 	let model: UniversalSentenceEncoder | null = null;
 
@@ -111,6 +110,7 @@ import CloseIcon from '~icons/mingcute/close-fill';
 			viewTransition(() => searchDialog.showModal());
 		});
 
+		const migrationTrigger = getElement('migration-trigger') as HTMLInputElement;
 		migrationTrigger.addEventListener('input', async () => {
 			const files = migrationTrigger.files;
 			const sqliteFile = files?.item(0);
@@ -124,7 +124,7 @@ import CloseIcon from '~icons/mingcute/close-fill';
 				await writable.write(chunk);
 			}
 			await writable.close();
-			console.info('Done writing');
+			window.location.reload();
 		});
 	}
 

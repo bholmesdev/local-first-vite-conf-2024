@@ -50,7 +50,7 @@ import CloseIcon from '~icons/mingcute/close-fill';
 			<label
 				class="fixed bottom-4 right-4 rounded bg-gray-50 text-gray-800 text-sm shadow flex flex-col gap-2 p-4 w-56"
 				>Seed a SQLite file
-				<input type="file" id="migration-trigger" />
+				<input type="file" id="seed-trigger" />
 			</label>
 		</main>
 	</body>
@@ -110,9 +110,9 @@ import CloseIcon from '~icons/mingcute/close-fill';
 			viewTransition(() => searchDialog.showModal());
 		});
 
-		const migrationTrigger = getElement('migration-trigger') as HTMLInputElement;
-		migrationTrigger.addEventListener('input', async () => {
-			const files = migrationTrigger.files;
+		const seedTrigger = getElement('seed-trigger') as HTMLInputElement;
+		seedTrigger.addEventListener('input', async () => {
+			const files = seedTrigger.files;
 			const sqliteFile = files?.item(0);
 			if (!sqliteFile) return;
 			const opfsRoot = await navigator.storage.getDirectory();

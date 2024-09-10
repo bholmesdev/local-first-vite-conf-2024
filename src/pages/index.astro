@@ -1,186 +1,178 @@
 ---
-import SearchIcon from "~icons/mingcute/search2-fill";
+import SearchIcon from '~icons/mingcute/search2-fill';
 ---
 
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
-  </head>
-  <body>
-    <h1 id="title" contenteditable="plaintext-only" class="outline-none"></h1>
-    <article id="text" contenteditable="plaintext-only" class="outline-none">
-    </article>
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+	<body>
+		<h1 id="title" contenteditable="plaintext-only" class="outline-none"></h1>
+		<article id="text" contenteditable="plaintext-only" class="outline-none"></article>
 
-    <button id="search-trigger">
-      <span class="sr-only">Search</span>
-      <SearchIcon />
-    </button>
+		<button id="search-trigger">
+			<span class="sr-only">Search</span>
+			<SearchIcon />
+		</button>
 
-    <input type="file" id="migration-trigger" />
+		<input type="file" id="migration-trigger" />
 
-    <dialog
-      id="search-dialog"
-      class="max-w-prose w-full h-[70dvh] rounded shadow-2xl px-8 py-4"
-    >
-      <h1>Search</h1>
-      <form
-        class="flex gap-2 px-4 py-2 relative rounded border border-slate-300 w-full justify-end"
-      >
-        <label class="sr-only" for="search">Search</label>
-        <input
-          type="text"
-          placeholder="Search"
-          id="search"
-          class="absolute inset-0 w-full h-full px-4 py-2 pr-12"
-        />
-        <SearchIcon class="z-10" />
-      </form>
-      <form method="dialog"><button>Close</button></form>
-      <ul id="search-results" class="flex flex-col gap-2"></ul>
-    </dialog>
-  </body>
+		<dialog id="search-dialog" class="max-w-prose w-full h-[70dvh] rounded shadow-2xl px-8 py-4">
+			<h1>Search</h1>
+			<form
+				class="flex gap-2 px-4 py-2 relative rounded border border-slate-300 w-full justify-end"
+			>
+				<label class="sr-only" for="search">Search</label>
+				<input
+					type="text"
+					placeholder="Search"
+					id="search"
+					class="absolute inset-0 w-full h-full px-4 py-2 pr-12"
+				/>
+				<SearchIcon class="z-10" />
+			</form>
+			<form method="dialog"><button>Close</button></form>
+			<ul id="search-results" class="flex flex-col gap-2"></ul>
+		</dialog>
+	</body>
 </html>
 
 <script is:inline src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<script is:inline src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"
+></script>
 
 <script>
-  import { eq, like, isNotNull } from "drizzle-orm";
-  import { db, Docs, initTables } from "../lib/db";
-  import { cosineSimilarity, getElement } from "../utils";
-  import type { UniversalSentenceEncoder } from "@tensorflow-models/universal-sentence-encoder";
+	import { eq, like, isNull } from 'drizzle-orm';
+	import { db, Docs, initTables } from '../lib/db';
+	import { cosineSimilarity, getElement } from '../utils';
+	import type { UniversalSentenceEncoder } from '@tensorflow-models/universal-sentence-encoder';
 
-  const title = getElement("title");
-  const text = getElement("text");
-  const search = getElement("search") as HTMLInputElement;
-  const searchDialog = getElement("search-dialog") as HTMLDialogElement;
-  const searchTrigger = getElement("search-trigger");
-  const migrationTrigger = getElement('migration-trigger') as HTMLInputElement;
-  const searchResults = getElement("search-results");
+	const title = getElement('title');
+	const text = getElement('text');
+	const search = getElement('search') as HTMLInputElement;
+	const searchDialog = getElement('search-dialog') as HTMLDialogElement;
+	const searchTrigger = getElement('search-trigger');
+	const migrationTrigger = getElement('migration-trigger') as HTMLInputElement;
+	const searchResults = getElement('search-results');
 
-  let model: UniversalSentenceEncoder | null = null;
+	let model: UniversalSentenceEncoder | null = null;
 
-  async function initEditor() {
-    let docId = Number(window.location.hash.slice(1));
+	async function initEditor() {
+		let docId = Number(window.location.hash.slice(1));
 
-    async function initContent() {
-      let doc = await db.select().from(Docs).where(eq(Docs.id, docId)).get();
-      if (!doc) {
-        doc = await db
-          .insert(Docs)
-          .values({ title: "Untitled", text: "" })
-          .returning()
-          .get();
-        window.location.hash = `${doc.id}`;
-      }
+		async function initContent() {
+			let doc = await db.select().from(Docs).where(eq(Docs.id, docId)).get();
+			if (!doc) {
+				doc = await db.insert(Docs).values({ title: 'Untitled', text: '' }).returning().get();
+				window.location.hash = `${doc.id}`;
+			}
 
-      title.innerText = doc.title;
-      text.innerText = doc.text;
-    }
-    await initContent();
+			title.innerText = doc.title;
+			text.innerText = doc.text;
+		}
+		await initContent();
 
-    window.addEventListener("hashchange", () => {
-      searchDialog.close();
-      docId = Number(window.location.hash.slice(1));
-      initContent();
-    });
+		window.addEventListener('hashchange', () => {
+			searchDialog.close();
+			docId = Number(window.location.hash.slice(1));
+			initContent();
+		});
 
-    title.addEventListener("input", async () => {
-      await db
-        .update(Docs)
-        .set({ title: title.innerText })
-        .where(eq(Docs.id, docId));
-    });
+		title.addEventListener('input', async () => {
+			await db.update(Docs).set({ title: title.innerText }).where(eq(Docs.id, docId));
+			await initVectors();
+		});
 
-    text.addEventListener("input", async () => {
-      await db
-        .update(Docs)
-        .set({ text: text.innerText })
-        .where(eq(Docs.id, docId));
-    });
+		text.addEventListener('input', async () => {
+			await db.update(Docs).set({ text: text.innerText }).where(eq(Docs.id, docId));
+			await initVectors();
+		});
 
-    searchTrigger.addEventListener("click", () => {
-      searchDialog.showModal();
-    });
+		searchTrigger.addEventListener('click', () => {
+			searchDialog.showModal();
+		});
 
-    migrationTrigger.addEventListener('input', async () => {
-      const files = migrationTrigger.files;
-      const sqliteFile = files?.item(0);
-      if (!sqliteFile) return;
-      const opfsRoot = await navigator.storage.getDirectory();
-      const fileHandle = await opfsRoot.getFileHandle('database.sqlite3');
-      const writable = await fileHandle.createWritable();
+		migrationTrigger.addEventListener('input', async () => {
+			const files = migrationTrigger.files;
+			const sqliteFile = files?.item(0);
+			if (!sqliteFile) return;
+			const opfsRoot = await navigator.storage.getDirectory();
+			const fileHandle = await opfsRoot.getFileHandle('database.sqlite3');
+			const writable = await fileHandle.createWritable();
 
-      await writable.truncate(0);
-      for await (const chunk of sqliteFile.stream()) {
-        await writable.write(chunk);
-      }
-      await writable.close();
-      console.info('Done writing');
-    })
-  }
+			await writable.truncate(0);
+			for await (const chunk of sqliteFile.stream()) {
+				await writable.write(chunk);
+			}
+			await writable.close();
+			console.info('Done writing');
+		});
+	}
 
-  async function initVectors(model: UniversalSentenceEncoder) {
-    const dataset = await db.select().from(Docs).where(isNotNull(Docs.vector));
-    if (dataset.length === 0) return;
+	async function initVectors() {
+		if (!model) return;
+		const dataset = await db.select().from(Docs).where(isNull(Docs.vector));
+		if (dataset.length === 0) return;
 
-    for (const doc of dataset) {
-      const embedding = await model.embed([doc.title]).then((e) => e.data());
-      
-      await db.update(Docs).set({
-        vector: Array.from(embedding),
-      }).where(eq(Docs.id, doc.id));
-    }
-  }
+		for (const doc of dataset) {
+			const embedding = await model.embed([doc.title]).then((e) => e.data());
 
-  search.addEventListener("input", async (e) => {
-    const query = search.value;
-    if (!query.length) {
-      searchResults.innerHTML = "";
-      return;
-    }
-    const results = model ? await vectorSearch(query) : await textSearch(query);
-    searchResults.innerHTML = "";
-    for (const result of results) {
-      searchResults.innerHTML += `<li><a href="/#${result.id}">${result.title} ${'similarity' in result ? result.similarity : ''}</a></li>`;
-    }
-  });
+			await db
+				.update(Docs)
+				.set({
+					vector: Array.from(embedding)
+				})
+				.where(eq(Docs.id, doc.id));
+		}
+	}
 
-  function textSearch(query: string) {
-    return db
-      .select()
-      .from(Docs)
-      .where(like(Docs.title, `%${query}%`))
-      .orderBy(Docs.title);
-  }
+	search.addEventListener('input', async (e) => {
+		const query = search.value;
+		if (!query.length) {
+			searchResults.innerHTML = '';
+			return;
+		}
+		const results = model ? await vectorSearch(query) : await textSearch(query);
+		searchResults.innerHTML = '';
+		for (const result of results) {
+			searchResults.innerHTML += `<li><a href="/#${result.id}">${result.title} ${'similarity' in result ? result.similarity : ''}</a></li>`;
+		}
+	});
 
-  async function vectorSearch(query: string) {
-    if (!model) return [];
-    const results = await db
-      .select()
-      .from(Docs)
-      .orderBy(Docs.title);
+	function textSearch(query: string) {
+		return db
+			.select()
+			.from(Docs)
+			.where(like(Docs.title, `%${query}%`))
+			.orderBy(Docs.title);
+	}
 
-    const queryEmbedding = await model.embed([query]).then((e) => e.data());
+	async function vectorSearch(query: string) {
+		if (!model) return [];
+		const results = await db.select().from(Docs).orderBy(Docs.title);
 
-    return results.map((row) => {
-      const docEmbedding = row.vector;
-      if (!docEmbedding) return { ...row, similarity: 0 };
+		const queryEmbedding = await model.embed([query]).then((e) => e.data());
 
-      const similarity = cosineSimilarity(Array.from(queryEmbedding), docEmbedding);
-      return { ...row, similarity };
-    }).sort((a, b) => b.similarity - a.similarity);
-  }
+		return results
+			.map((row) => {
+				const docEmbedding = row.vector;
+				if (!docEmbedding) return { ...row, similarity: 0 };
 
-  await initTables();
-  await initEditor();
-  use.load().then((m) => {
-    console.log("Model loaded");
-    model = m;
-    initVectors(m);
-  });
+				const similarity = cosineSimilarity(Array.from(queryEmbedding), docEmbedding);
+				return { ...row, similarity };
+			})
+			.sort((a, b) => b.similarity - a.similarity);
+	}
+
+	await initTables();
+	await initEditor();
+	use.load().then((m) => {
+		console.log('Model loaded');
+		model = m;
+		initVectors();
+	});
 </script>

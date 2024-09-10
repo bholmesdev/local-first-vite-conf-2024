@@ -21,7 +21,7 @@ import CloseIcon from '~icons/mingcute/close-fill';
 				<SearchIcon />
 			</button>
 
-			<dialog id="search-dialog" class="max-w-prose w-full h-[70dvh] rounded shadow-2xl px-8 py-4">
+			<dialog id="search-dialog" class="max-w-prose w-full h-[70dvh] rounded shadow-2xl sm:p-8 p-4">
 				<h2 class="sr-only">Search</h2>
 				<div class="flex gap-4 items-center mb-4">
 					<form
@@ -40,7 +40,7 @@ import CloseIcon from '~icons/mingcute/close-fill';
 						<button><span class="sr-only">Close</span><CloseIcon /></button>
 					</form>
 				</div>
-				<ul id="search-results" class="flex flex-col gap-2"></ul>
+				<ul id="search-results" class="flex flex-col gap-4"></ul>
 			</dialog>
 		</nav>
 		<main class="mx-auto max-w-prose px-4 py-2 sm:px-32 sm:py-16 shadow-xl min-h-dvh">
@@ -63,7 +63,7 @@ import CloseIcon from '~icons/mingcute/close-fill';
 <script>
 	import { eq, like, isNull } from 'drizzle-orm';
 	import { db, Docs, initTables } from '../lib/db';
-	import { cosineSimilarity, getElement } from '../utils';
+	import { cosineSimilarity, getElement, viewTransition } from '../utils';
 	import type { UniversalSentenceEncoder } from '@tensorflow-models/universal-sentence-encoder';
 
 	const title = getElement('title');
@@ -92,7 +92,7 @@ import CloseIcon from '~icons/mingcute/close-fill';
 		await initContent();
 
 		window.addEventListener('hashchange', () => {
-			searchDialog.close();
+			viewTransition(() => searchDialog.close());
 			docId = Number(window.location.hash.slice(1));
 			initContent();
 		});
@@ -108,7 +108,7 @@ import CloseIcon from '~icons/mingcute/close-fill';
 		});
 
 		searchTrigger.addEventListener('click', () => {
-			searchDialog.showModal();
+			viewTransition(() => searchDialog.showModal());
 		});
 
 		migrationTrigger.addEventListener('input', async () => {

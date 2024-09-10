@@ -11,7 +11,7 @@ import CloseIcon from '~icons/mingcute/close-fill';
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro</title>
 	</head>
-	<body>
+	<body class="text-gray-950">
 		<nav>
 			<button
 				id="search-trigger"
@@ -43,12 +43,12 @@ import CloseIcon from '~icons/mingcute/close-fill';
 				<ul id="search-results" class="flex flex-col gap-2"></ul>
 			</dialog>
 		</nav>
-		<main class="mx-auto max-w-prose px-32 py-16 shadow-xl min-h-dvh">
+		<main class="mx-auto max-w-prose px-4 py-2 sm:px-32 sm:py-16 shadow-xl min-h-dvh">
 			<h1 id="title" contenteditable="plaintext-only" class="text-2xl font-bold mb-4 outline-none">
 			</h1>
 			<article id="text" contenteditable="plaintext-only" class="outline-none"></article>
 			<label
-				class="fixed bottom-4 right-4 rounded bg-gray-800 text-white flex flex-col gap-2 p-4 w-64"
+				class="fixed bottom-4 right-4 rounded bg-gray-50 text-gray-800 text-sm shadow flex flex-col gap-2 p-4 w-56"
 				>Seed a SQLite file
 				<input type="file" id="migration-trigger" />
 			</label>

@@ -1,0 +1,10 @@
+{
+  "t:queryembedding": {
+    "scope": "",
+    "prefix": "t:queryembedding",
+    "body": [
+      "\t\tconst queryEmbedding = await model.embed([query]).then((e) => e.data());"
+    ],
+    "description": ""
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "t:notdoc": {
+    "scope": "",
+    "prefix": "t:notdoc",
+    "body": [
+      "\t\t\tif (!doc) {\n\t\t\t\tdoc = await db.insert(Docs).values({ title: 'Untitled', text: '' }).returning().get();\n\t\t\t\twindow.location.hash = `\\${doc.id}`;\n\t\t\t}"
+    ],
+    "description": ""
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "t:similaritytext": {
+    "scope": "",
+    "prefix": "t:similaritytext",
+    "body": [
+      "'similarity' in result ? result.similarity : ''"
+    ],
+    "description": ""
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "t:seed": {
+    "scope": "",
+    "prefix": "t:seed",
+    "body": [
+      "\t\tconst seedTrigger = getElement('seed-trigger') as HTMLInputElement;\n\t\tseedTrigger.addEventListener('input', async () => {\n\t\t\tconst files = seedTrigger.files;\n\t\t\tconst sqliteFile = files?.item(0);\n\t\t\tif (!sqliteFile) return;\n\t\t\tconst opfsRoot = await navigator.storage.getDirectory();\n\t\t\tconst fileHandle = await opfsRoot.getFileHandle('database.sqlite3');\n\t\t\tconst writable = await fileHandle.createWritable();\n\n\t\t\tawait writable.truncate(0);\n\t\t\tfor await (const chunk of sqliteFile.stream()) {\n\t\t\t\tawait writable.write(chunk);\n\t\t\t}\n\t\t\tawait writable.close();\n\t\t\twindow.location.reload();\n\t\t});"
+    ],
+    "description": ""
+  }
+}

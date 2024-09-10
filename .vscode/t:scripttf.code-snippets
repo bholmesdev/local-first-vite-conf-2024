@@ -1,0 +1,10 @@
+{
+  "t:scripttf": {
+    "scope": "",
+    "prefix": "t:scripttf",
+    "body": [
+      "<!-- Couldn't bundle the sentence encoder with Vite :( -->\n<script is:inline src=\"https://cdn.jsdelivr.net/npm/@tensorflow/tfjs\"></script>\n<script is:inline src=\"https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder\"\n></script>"
+    ],
+    "description": ""
+  }
+}

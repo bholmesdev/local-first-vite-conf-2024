@@ -1,0 +1,10 @@
+{
+  "t:results": {
+    "scope": "",
+    "prefix": "t:results",
+    "body": [
+      "\t\tsearchResults.innerHTML = '';\n\t\tfor (const result of results) {\n\t\t\tsearchResults.innerHTML += `<li><a href=\"/#\\${result.id}\">\\${result.title}</a></li>`;\n\t\t}"
+    ],
+    "description": ""
+  }
+}

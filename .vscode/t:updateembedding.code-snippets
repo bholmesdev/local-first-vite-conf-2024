@@ -1,0 +1,10 @@
+{
+  "t:updateembedding": {
+    "scope": "",
+    "prefix": "t:updateembedding",
+    "body": [
+      "\t\t\tawait db\n\t\t\t\t.update(Docs)\n\t\t\t\t.set({\n\t\t\t\t\tvector: Array.from(embedding)\n\t\t\t\t})\n\t\t\t\t.where(eq(Docs.id, doc.id));"
+    ],
+    "description": ""
+  }
+}

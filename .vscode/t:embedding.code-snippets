@@ -1,0 +1,10 @@
+{
+  "t:embedding": {
+    "scope": "",
+    "prefix": "t:embedding",
+    "body": [
+      "\t\t\tconst embedding = await model.embed([doc.title]).then((e) => e.data());"
+    ],
+    "description": ""
+  }
+}

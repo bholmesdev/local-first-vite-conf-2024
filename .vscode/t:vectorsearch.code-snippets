@@ -1,0 +1,10 @@
+{
+  "t:vectorsearch": {
+    "scope": "",
+    "prefix": "t:vectorsearch",
+    "body": [
+      "\t\tif (!model) return [];\n\t\tconst results = await db.select().from(Docs);\n\t\tconst queryEmbedding = await model.embed([query]).then((e) => e.data());"
+    ],
+    "description": ""
+  }
+}

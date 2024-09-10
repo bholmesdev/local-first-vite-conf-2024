@@ -1,0 +1,10 @@
+{
+  "t:vectorresults": {
+    "scope": "",
+    "prefix": "t:vectorresults",
+    "body": [
+      "\t\treturn results\n\t\t\t.map((row) => {\n\n\t\t\t})\n\t\t\t.sort((a, b) => b.similarity - a.similarity);"
+    ],
+    "description": ""
+  }
+}

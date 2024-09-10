@@ -1,0 +1,10 @@
+{
+  "t:searchelements": {
+    "scope": "",
+    "prefix": "t:searchelements",
+    "body": [
+      "\tconst search = getElement('search') as HTMLInputElement;\n\tconst searchDialog = getElement('search-dialog') as HTMLDialogElement;\n\tconst searchResults = getElement('search-results');\n\tconst searchTrigger = getElement('search-trigger');"
+    ],
+    "description": ""
+  }
+}

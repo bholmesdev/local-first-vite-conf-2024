@@ -1,0 +1,10 @@
+{
+  "t:initvectors": {
+    "scope": "",
+    "prefix": "t:initvectors",
+    "body": [
+      "\t\tif (!model) return;\n\t\tconst dataset = await db.select().from(Docs).where(isNull(Docs.vector));\n\t\tif (dataset.length === 0) return;\n\n\t\tfor (const doc of dataset) {\n\n\t\t}"
+    ],
+    "description": ""
+  }
+}

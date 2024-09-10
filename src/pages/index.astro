@@ -56,10 +56,6 @@ import CloseIcon from '~icons/mingcute/close-fill';
 	</body>
 </html>
 
-<script is:inline src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<script is:inline src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"
-></script>
-
 <script>
 	import { eq, like, isNull } from 'drizzle-orm';
 	import { db, Docs, initTables } from '../lib/db';
@@ -68,10 +64,6 @@ import CloseIcon from '~icons/mingcute/close-fill';
 
 	const title = getElement('title');
 	const text = getElement('text');
-	const search = getElement('search') as HTMLInputElement;
-	const searchDialog = getElement('search-dialog') as HTMLDialogElement;
-	const searchResults = getElement('search-results');
-	const searchTrigger = getElement('search-trigger');
 
 	let model: UniversalSentenceEncoder | null = null;
 
@@ -79,115 +71,30 @@ import CloseIcon from '~icons/mingcute/close-fill';
 		let docId = Number(window.location.hash.slice(1));
 
 		async function initContent() {
-			let doc = await db.select().from(Docs).where(eq(Docs.id, docId)).get();
-			if (!doc) {
-				doc = await db.insert(Docs).values({ title: 'Untitled', text: '' }).returning().get();
-				window.location.hash = `${doc.id}`;
-			}
-
-			title.innerText = doc.title;
-			text.innerText = doc.text;
+			// Init content and inputs
 		}
 		await initContent();
 
 		window.addEventListener('hashchange', () => {
-			viewTransition(() => searchDialog.close());
 			docId = Number(window.location.hash.slice(1));
 			initContent();
-		});
-
-		title.addEventListener('input', async () => {
-			await db.update(Docs).set({ title: title.innerText }).where(eq(Docs.id, docId));
-			await initVectors();
-		});
-
-		text.addEventListener('input', async () => {
-			await db.update(Docs).set({ text: text.innerText }).where(eq(Docs.id, docId));
-			await initVectors();
-		});
-
-		searchTrigger.addEventListener('click', () => {
-			viewTransition(() => searchDialog.showModal());
-		});
-
-		const seedTrigger = getElement('seed-trigger') as HTMLInputElement;
-		seedTrigger.addEventListener('input', async () => {
-			const files = seedTrigger.files;
-			const sqliteFile = files?.item(0);
-			if (!sqliteFile) return;
-			const opfsRoot = await navigator.storage.getDirectory();
-			const fileHandle = await opfsRoot.getFileHandle('database.sqlite3');
-			const writable = await fileHandle.createWritable();
-
-			await writable.truncate(0);
-			for await (const chunk of sqliteFile.stream()) {
-				await writable.write(chunk);
-			}
-			await writable.close();
-			window.location.reload();
 		});
 	}
 
 	async function initVectors() {
-		if (!model) return;
-		const dataset = await db.select().from(Docs).where(isNull(Docs.vector));
-		if (dataset.length === 0) return;
-
-		for (const doc of dataset) {
-			const embedding = await model.embed([doc.title]).then((e) => e.data());
-
-			await db
-				.update(Docs)
-				.set({
-					vector: Array.from(embedding)
-				})
-				.where(eq(Docs.id, doc.id));
-		}
+		// Add or update embeddings for all documents
 	}
 
-	search.addEventListener('input', async (e) => {
-		const query = search.value;
-		if (!query.length) {
-			searchResults.innerHTML = '';
-			return;
-		}
-		const results = model ? await vectorSearch(query) : await textSearch(query);
-		searchResults.innerHTML = '';
-		for (const result of results) {
-			searchResults.innerHTML += `<li><a href="/#${result.id}">${result.title} ${'similarity' in result ? result.similarity : ''}</a></li>`;
-		}
-	});
-
 	function textSearch(query: string) {
-		return db
-			.select()
-			.from(Docs)
-			.where(like(Docs.title, `%${query}%`))
-			.orderBy(Docs.title);
+		// Search wtih SQLite LIKE
+		return [];
 	}
 
 	async function vectorSearch(query: string) {
-		if (!model) return [];
-		const results = await db.select().from(Docs).orderBy(Docs.title);
-
-		const queryEmbedding = await model.embed([query]).then((e) => e.data());
-
-		return results
-			.map((row) => {
-				const docEmbedding = row.vector;
-				if (!docEmbedding) return { ...row, similarity: 0 };
-
-				const similarity = cosineSimilarity(Array.from(queryEmbedding), docEmbedding);
-				return { ...row, similarity };
-			})
-			.sort((a, b) => b.similarity - a.similarity);
+		// Search with tensorflow vectors
+		return [];
 	}
 
 	await initTables();
 	await initEditor();
-	use.load().then((m) => {
-		console.log('Model loaded');
-		model = m;
-		initVectors();
-	});
 </script>

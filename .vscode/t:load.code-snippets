@@ -1,0 +1,10 @@
+{
+  "t:load": {
+    "scope": "",
+    "prefix": "t:load",
+    "body": [
+      "\tuse.load().then((m) => {\n\t\tconsole.log('Model loaded');\n\t\tmodel = m;\n\t\tinitVectors();\n\t});"
+    ],
+    "description": ""
+  }
+}

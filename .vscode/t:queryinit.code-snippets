@@ -1,0 +1,10 @@
+{
+  "t:queryinit": {
+    "scope": "",
+    "prefix": "t:queryinit",
+    "body": [
+      "\t\tconst query = search.value;\n\t\tif (!query.length) {\n\t\t\tsearchResults.innerHTML = '';\n\t\t\treturn;\n\t\t}"
+    ],
+    "description": ""
+  }
+}

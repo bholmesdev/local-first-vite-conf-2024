@@ -1,0 +1,10 @@
+{
+  "t:update": {
+    "scope": "",
+    "prefix": "t:update",
+    "body": [
+      "\t\t\tawait db.update(Docs).set({ title: title.innerText }).where(eq(Docs.id, docId));"
+    ],
+    "description": ""
+  }
+}
